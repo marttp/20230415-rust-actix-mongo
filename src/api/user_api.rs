@@ -58,16 +58,16 @@ pub async fn update_user(
 
     match update_result {
         Ok(update) => {
-            if update.matched_count == 1 {
+            return if update.matched_count == 1 {
                 let updated_user_info = db.get_user(&id).await;
 
-                return match updated_user_info {
+                match updated_user_info {
                     Ok(user) => HttpResponse::Ok().json(user),
                     Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
-                };
+                }
             } else {
-                return HttpResponse::NotFound().body("No user found with specified ID");
-            }
+                HttpResponse::NotFound().body("No user found with specified ID")
+            };
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
@@ -83,11 +83,11 @@ pub async fn delete_user(db: Data<MongoRepo>, path: Path<String>) -> HttpRespons
 
     match result {
         Ok(res) => {
-            if res.deleted_count == 1 {
-                return HttpResponse::Ok().json("User successfully deleted!");
+            return if res.deleted_count == 1 {
+                HttpResponse::Ok().json("User successfully deleted!")
             } else {
-                return HttpResponse::NotFound().json("User with specified ID not found!");
-            }
+                HttpResponse::NotFound().json("User with specified ID not found!")
+            };
         }
         Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
     }
